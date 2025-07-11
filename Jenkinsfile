@@ -1,27 +1,24 @@
-pipeline {
-  agent any
-  stages {
-    stage('Build') {
-      steps {
-        echo 'Building..'
-      }
+pipeline { 
+    agent any 
+    options {
+        skipStagesAfterUnstable()
     }
-    stage('Test') {
-      steps {
-        parallel(
-          "Test": {
-            echo 'Testing..'
-          },
-          "Integration Test": {
-            echo 'Integration Test testing 1234567...'
-          }
-        )
-      }
+    stages {
+        stage('Build') { 
+            steps { 
+                sh 'make' 
+            }
+        }
+        stage('Test'){
+            steps {
+                sh 'make check'
+                junit 'reports/**/*.xml' 
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'make publish' //
+            }
+        }
     }
-    stage('Deploy') {
-      steps {
-        echo 'Deploying 123....'
-      }
-    }
-  }
 }
